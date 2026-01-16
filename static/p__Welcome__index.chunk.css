@@ -1,0 +1,1 @@
+.test-color{color:var(--color-primary);font-size:20px;padding:20px;border:1px solid var(--color-border);border-radius:4px;background-color:var(--color-bg)}.theme-dark .test-color{color:var(--color-error, #ff4d4f)}

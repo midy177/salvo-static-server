@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkpc_web=self.webpackChunkpc_web||[]).push([[866],{7170:function(s,u,n){n.r(u),n.d(u,{default:function(){return a}});var t=n(8340),e=n(31549);function a(){return(0,e.jsx)(t.Navigate,{to:"/home",replace:!0})}}}]);

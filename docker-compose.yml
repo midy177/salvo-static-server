@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # 开发环境
+  app-dev:
+    build: .
+    container_name: salvo-static-dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./static:/app/static
+      - ./temp:/app/temp
+    environment:
+      - RUST_LOG=debug
+    command: ["./salvo-static-server", "--http-addr", "0.0.0.0:8080", "--log-level", "debug"]
+    profiles:
+      - dev
+
+  # 生产环境
+  app-prod:
+    build: .
+    container_name: salvo-static-prod
+    ports:
+      - "80:8080"
+      - "443:8443"
+    volumes:
+      - ./static:/app/static:ro
+      - ./temp:/app/temp
+      - letsencrypt:/app/temp/letsencrypt
+    environment:
+      - RUST_LOG=info
+    command: 
+      - "./salvo-static-server"
+      - "--http-addr"
+      - "0.0.0.0:8080"
+      - "--https-addr"
+      - "0.0.0.0:8443"
+      - "--https-enable"
+      - "--acme-domain"
+      - "${DOMAIN:-localhost}"
+      - "--force-https"
+
+    restart: unless-stopped
+    profiles:
+      - prod
+
+  # Nginx 反向代理（可选）
+  nginx:
+    image: nginx:alpine
+    container_name: salvo-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./static:/usr/share/nginx/html:ro
+      - letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - app-prod
+    restart: unless-stopped
+    profiles:
+      - nginx
+
+volumes:
+  letsencrypt:
+    driver: local
